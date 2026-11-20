@@ -34,7 +34,13 @@ class VigenereCipher:
         str
             The shifted letter.
         """
-        shifted_letter = ''
+
+        if forward:
+            position = (ord(letter) - self.offset + shift) % 26
+        else:
+            position = (ord(letter) - self.offset - shift) % 26
+        
+        shifted_letter = chr(position + self.offset)
         return shifted_letter
 
     def __generate_shift_list(self, plaintext_length: int):
@@ -58,7 +64,16 @@ class VigenereCipher:
         list
             A list of shifts (integers).
         """
+        remainder = plaintext_length % len(self.keyword)
+        keywordnum = plaintext_length // len(self.keyword)
+        repeatedkeyword = ((self.keyword * keywordnum) + self.keyword[:remainder])
         shift_list = []
+        for letter in repeatedkeyword:
+            shift_list.append(ord(letter) - self.offset)
+        
+
+        
+        
         return shift_list
 
     def encrypt(self, plaintext: str):
@@ -82,7 +97,18 @@ class VigenereCipher:
         str
             The ciphertext string.
         """
+        plaintext_toupper = plaintext.upper()
+        ready_to_encrypt = "".join(c for c in plaintext_toupper if c.isalpha())
+        shift_list = self.__generate_shift_list(len(ready_to_encrypt))
         ciphertext = ''
+        count = 0
+        for i in shift_list:
+            ciphertext += (self.__shift_letter(ready_to_encrypt[count], i, True))
+            count = count + 1
+
+        
+
+        
         return ciphertext
 
     def decrypt(self, ciphertext: str):
@@ -109,7 +135,18 @@ class VigenereCipher:
         str
             The plaintext string.
         """
+        ciphertext_toupper = ciphertext.upper()
+        ready_to_decrypt = "".join(c for c in ciphertext_toupper if c.isalpha())
+        shift_list = self.__generate_shift_list(len(ready_to_decrypt))
+        count = 0
         plaintext = ''
+        for i in shift_list:
+            plaintext += (self.__shift_letter(ready_to_decrypt[count], i, False))
+            count = count + 1
+
+        
+
+       
         return plaintext
 
 
